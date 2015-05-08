@@ -1,0 +1,48 @@
+<app>
+	<app-form></app-form>
+	<app-todos></app-todos>
+	
+	<script>
+		var form = this.tags['app-form'];
+		var todo = this.tags['app-todos'];
+		form.model = app.todoModel;
+		app.todoModel.on('change', function(){
+			form.init();
+			todo.render(this.data);
+		});
+	</script>
+</app>
+
+<app-form>
+	<form onsubmit="{{add}}">
+		<input type="text" name="text" onkeyup="{{edit}}">
+		<button disabled="{{!isAddable}}">Add</button>
+	</form>
+	
+	<script>
+		init(){
+			this.text.value = '';
+			this.isAddable = false;
+		}
+		add(){
+			this.model.add(this.text.value);
+		}
+		edit(){
+			this.isAddable = (this.text.value !== '');
+		}
+		this.collection = [];
+	</script>
+</app-form>
+
+<app-todos>
+	<ul>
+		<li each="{{model in collection}}">{{model}}</li>
+	</ul>
+	
+	<script>
+		render(data){
+			this.collection = data;
+			this.update();
+		}
+	</script>
+</app-todos>
