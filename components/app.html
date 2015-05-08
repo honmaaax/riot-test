@@ -6,8 +6,12 @@
 		var form = this.tags['app-form'];
 		var todo = this.tags['app-todos'];
 		form.model = app.todoModel;
-		app.todoModel.on('change', function(){
+		todo.model = app.todoModel;
+		app.todoModel.on('add', function(){
 			form.init();
+			todo.render(this.data);
+		});
+		app.todoModel.on('change', function(){
 			todo.render(this.data);
 		});
 	</script>
@@ -25,24 +29,42 @@
 			this.isAddable = false;
 		}
 		add(){
-			this.model.add(this.text.value);
+			this.model.add({
+				value : this.text.value,
+				isDone : false
+			});
 		}
 		edit(){
 			this.isAddable = (this.text.value !== '');
 		}
-		this.collection = [];
 	</script>
 </app-form>
 
 <app-todos>
 	<ul>
-		<li each="{{model in collection}}">{{model}}</li>
+		<li each="{{model, i in collection}}">
+			<input type="checkbox" name="isDone" checked="{{model.isDone}}" onclick="{{parent.toggleeee}}">
+			<span class="{{isdone : model.isDone}}">{{model.value}}</span>
+		</li>
 	</ul>
+	
+	<style scoped>
+		.isdone {
+			text-decoration: line-through;
+		}
+	</style>
 	
 	<script>
 		render(data){
 			this.collection = data;
 			this.update();
-		}
+		};
+		toggleeee(e){
+			var index = e.item.i;
+			this.model.set({
+				value : this.model.data[index].value,
+				isDone : !this.model.data[index].isDone
+			}, index);
+		};
 	</script>
 </app-todos>
