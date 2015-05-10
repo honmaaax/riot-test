@@ -1,0 +1,25 @@
+<new-task-form>
+	<form onsubmit="{{add}}">
+		<input type="text" name="text" onkeyup="{{change}}">
+		<button disabled="{{!isAddable}}">Add</button>
+	</form>
+
+	<script>
+		add(){
+			this.actions.addTask({
+				value : this.text.value,
+				isDone : false
+			});
+		}
+		change(){
+			this.actions.changeNewTaskFormState({
+				value : this.text.value,
+				isAddable : (this.text.value !== '')
+			});
+		}
+		render(store){
+			this.text.value = store.newTaskFormState.value;
+			this.isAddable = store.newTaskFormState.isAddable;
+		}
+	</script>
+</new-task-form>

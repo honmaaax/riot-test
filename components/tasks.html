@@ -1,0 +1,24 @@
+<tasks>
+	<ul>
+		<li each="{{task, i in tasks}}">
+			<input type="checkbox" name="isDone" checked="{{task.isDone}}" onclick="{{parent.toggle}}">
+			<span class="{{isdone : task.isDone}}">{{task.value}}</span>
+		</li>
+	</ul>
+
+	<style scoped>
+		.isdone {
+			text-decoration: line-through;
+		}
+	</style>
+
+	<script>
+		toggle(e){
+			var index = e.item.i;
+			this.actions.toggleTask(index);
+		}
+		render(store){
+			this.tasks = store.tasks;
+		}
+	</script>
+</tasks>
