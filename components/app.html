@@ -1,70 +1,67 @@
 <app>
-	<app-form></app-form>
-	<app-todos></app-todos>
-	
+	<new-task-form></new-task-form>
+	<tasks></tasks>
+
 	<script>
-		var form = this.tags['app-form'];
-		var todo = this.tags['app-todos'];
-		form.model = app.todoModel;
-		todo.model = app.todoModel;
-		app.todoModel.on('add', function(){
-			form.init();
-			todo.render(this.data);
-		});
-		app.todoModel.on('change', function(){
-			todo.render(this.data);
+		var tags = this.tags;
+		tags['new-task-form'].actions = app.taskActions;
+		tags['tasks'].actions = app.taskActions;
+		app.store.on('change', function(){
+			_.forEach(tags, function(tag){
+				tag.render(app.store);
+				tag.update();
+			});
 		});
 	</script>
 </app>
 
-<app-form>
+<new-task-form>
 	<form onsubmit="{{add}}">
-		<input type="text" name="text" onkeyup="{{edit}}">
+		<input type="text" name="text" onkeyup="{{change}}">
 		<button disabled="{{!isAddable}}">Add</button>
 	</form>
-	
+
 	<script>
-		init(){
-			this.text.value = '';
-			this.isAddable = false;
-		}
 		add(){
-			this.model.add({
+			this.actions.addTask({
 				value : this.text.value,
 				isDone : false
 			});
 		}
-		edit(){
-			this.isAddable = (this.text.value !== '');
+		change(){
+			this.actions.changeNewTaskFormState({
+				value : this.text.value,
+				isAddable : (this.text.value !== '')
+			});
+		}
+		render(store){
+			this.text.value = store.newTaskFormState.value;
+			this.isAddable = store.newTaskFormState.isAddable;
 		}
 	</script>
-</app-form>
+</new-task-form>
 
-<app-todos>
+<tasks>
 	<ul>
-		<li each="{{model, i in collection}}">
-			<input type="checkbox" name="isDone" checked="{{model.isDone}}" onclick="{{parent.toggleeee}}">
-			<span class="{{isdone : model.isDone}}">{{model.value}}</span>
+		<li each="{{task, i in tasks}}">
+			<input type="checkbox" name="isDone" checked="{{task.isDone}}" onclick="{{parent.toggle}}">
+			<span class="{{isdone : task.isDone}}">{{task.value}}</span>
 		</li>
 	</ul>
-	
+
 	<style scoped>
 		.isdone {
 			text-decoration: line-through;
 		}
 	</style>
-	
+
 	<script>
-		render(data){
-			this.collection = data;
-			this.update();
-		};
-		toggleeee(e){
+		toggle(e){
 			var index = e.item.i;
-			this.model.set({
-				value : this.model.data[index].value,
-				isDone : !this.model.data[index].isDone
-			}, index);
-		};
+			this.actions.toggleTask(index);
+		}
+		render(store){
+			this.tasks = store.tasks;
+		}
 	</script>
-</app-todos>
+</tasks>
